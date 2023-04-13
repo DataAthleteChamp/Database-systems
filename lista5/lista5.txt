@@ -1,0 +1,143 @@
+Identyfikacja encji:
+ENC001 Kot (pseudonim, płeć, data_wstąpienia)
+ENC002 Banda (numer, nazwa)
+ENC003 Teren (numer, obszar)
+ENC004 Funkcja (nazwa, min_przydział, max_przydział)
+ENC005 Mysz (numer, data_upolowania, data_wydania, waga, długość)
+ENC006 Wróg (imię, gatunek, stopień_wrogości)
+ENC007 Incydent (opis, data)
+ENC008 Gratyfikacja (rodzaj, skuteczność)
+
+Identyfikacja związków między encjami:
+ZWI001 Należy_do (Kot (0..1) : Banda (0..))
+ZWI002 Dowodzi (Kot (1..1) : Banda (0..))
+ZWI003 Poluje_na (Banda (1..1) : Teren (0..))
+ZWI004 Pełni (Kot (1..1) : Funkcja (0..))
+ZWI005 Upolowana_przez (Mysz (0..1) : Kot (0..))
+ZWI006 Ma_wroga (Kot (0..) : Wróg (0..))
+ZWI007 Uczestniczył (Incydent (1..1) : Kot (0..), Wróg (0..))
+ZWI008 Skuteczna_dla (Gratyfikacja (0..) : Wróg (0..*))
+
+Diagram związków encji w załaczniku.
+
+Definicja w zapisie predykatowym relacji:
+
+REL001 Koty (pseudonim, płeć, data_wstąpienia, #numer_bandy, #nazwa_funkcji)
+REL002 Bandy (numer, nazwa, #pseudonim_dowódcy, #numer_terenu)
+REL003 Tereny (numer, obszar)
+REL004 Funkcje (nazwa, min_przydział, max_przydział)
+REL005 Myszy (numer, data_upolowania, data_wydania, waga, długość, #pseudonim_kota)
+REL006 Wrogowie (imię, gatunek, stopień_wrogości)
+REL007 Incydenty (opis, data, #pseudonim_kota, #imię_wroga)
+REL008 Gratyfikacje (rodzaj, skuteczność, #imię_wroga)
+
+Tabelaryczny opis relacji:
+REL001 Koty
+Pochodzenie relacji
+ENC001 Kot (pseudonim, płeć, data_wstąpienia)
+Wykorzystane związki
+ZWI001 Należy_do (Kot (0..1) : Banda (0..))
+ZWI004 Pełni (Kot (1..1) : Funkcja (0..))
+
+Atrybut	Dziedzina	Ograniczenie
+pseudonim	Łańcuch(30)	PK, NOT NULL
+płeć	CHAR(1)	NOT NULL, 'M' lub 'F'
+data_wstąpienia	Data	NOT NULL
+numer_bandy	liczba(6)	FK Bandy, NULL
+nazwa_funkcji	Łańcuch(30)	FK Funkcje, NOT NULL
+Ograniczenia tablicowe		Brak
+
+REL002 Bandy
+Pochodzenie relacji
+ENC002 Banda (numer, nazwa)
+Wykorzystane związki
+ZWI002 Dowodzi (Kot (1..1) : Banda (0..))
+ZWI003 Poluje_na (Banda (1..1) : Teren (0..))
+
+Atrybut	Dziedzina	Ograniczenie
+numer	liczba(6)	PK, NOT NULL
+nazwa	Łańcuch(30)	NOT NULL
+pseudonim_dowódcy	Łańcuch(30)	FK Koty, NOT NULL
+numer_terenu	liczba(6)	FK Tereny, NOT NULL
+Ograniczenia tablicowe		Brak
+
+REL003 Tereny
+Pochodzenie relacji
+ENC003 Teren (numer, obszar)
+
+Atrybut	Dziedzina	Ograniczenie
+numer	liczba(6)	PK, NOT NULL
+obszar	Łańcuch(100)	NOT NULL
+Ograniczenia tablicowe		Brak
+REL004 Funkcje
+Pochodzenie relacji
+ENC004 Funkcja (nazwa, min_przydział, max_przydział)
+
+Atrybut	Dziedzina	Ograniczenie
+nazwa	Łańcuch(30)	PK, NOT NULL
+min_przydział	liczba(6)	NOT NULL
+max_przydział	liczba(6)	NOT NULL, >= min_przydział
+Ograniczenia tablicowe		Brak
+
+REL005 Myszy
+Pochodzenie relacji
+ENC005 Mysz (numer, data_upolowania, data_wydania, waga, długość)
+Wykorzystane związki
+ZWI005 Upolowana_przez (Mysz (0..1) : Kot (0..*))
+
+Atrybut	Dziedzina	Ograniczenie
+numer	liczba(10)	PK, NOT NULL
+data_upolowania	Data	NOT NULL
+data_wydania	Data	NOT NULL
+waga	liczba(4,1)	NOT NULL, >=10
+długość	liczba(4,1)	NOT NULL, >=5
+pseudonim_kota	Łańcuch(30)	FK Koty, NOT NULL
+Ograniczenia tablicowe		Brak
+
+REL006 Wrogowie
+Pochodzenie relacji
+ENC006 Wróg (imię, gatunek)
+
+Atrybut	Dziedzina	Ograniczenie
+imię	Łańcuch(30)	PK, NOT NULL
+gatunek	Łańcuch(30)	NULL
+Ograniczenia tablicowe		Brak
+
+REL007 Incydenty
+Pochodzenie relacji
+ENC007 Incydent (opis, data, stopień_wrogości)
+Wykorzystane związki
+ZWI006 Uczestniczy (Kot (1..1) : Incydent (0..))
+ZWI007 Dotyczy (Wróg (1..1) : Incydent (0..))
+
+Atrybut	Dziedzina	Ograniczenie
+opis	Łańcuch(255)	PK, NOT NULL
+data	Data	NOT NULL
+stopień_wrogości	liczba(2)	NOT NULL, 1 <= stopień_wrogości <= 10
+pseudonim_kota	Łańcuch(30)	FK Koty, NOT NULL
+imię_wroga	Łańcuch(30)	FK Wrogowie, NOT NULL
+Ograniczenia tablicowe		Brak
+
+REL008 Gratyfikacje
+Pochodzenie relacji
+ENC008 Gratyfikacja (rodzaj, siła)
+
+Atrybut	Dziedzina	Ograniczenie
+rodzaj	Łańcuch(30)	PK, NOT NULL
+siła	liczba(6)	NOT NULL
+Ograniczenia tablicowe		Brak
+
+REL009 Negocjacje
+Pochodzenie relacji
+ENC009 Negocjacja (data, rodzaj_gratyfikacji, imię_wroga)
+Wykorzystane związki
+ZWI008 Przekupuje (Kot (1..1) : Negocjacja (0..))
+ZWI009 Dotyczy (Wróg (1..1) : Negocjacja (0..))
+ZWI010 Obejmuje (Gratyfikacja (1..1) : Negocjacja (0..*))
+
+Atrybut	Dziedzina	Ograniczenie
+data	Data	NOT NULL
+rodzaj_gratyfikacji	Łańcuch(30)	FK Gratyfikacje, NOT NULL
+imię_wroga	Łańcuch(30)	FK Wrogowie, NOT NULL
+pseudonim_kota	Łańcuch(30)	FK Koty, NOT NULL
+Ograniczenia tablicowe		Brak
